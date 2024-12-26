@@ -1,0 +1,34 @@
+{% extends 'orders/base.html' %}
+
+{% block content %}
+<h2>Edit Order</h2>
+
+<form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+
+    {% if user.is_superuser or user_in_salespersons %}
+        <!-- Render all fields for superuser and Salespersons -->
+        {{ form.as_p }}
+    {% else %}
+        <!-- Render only remark and progress for other users -->
+        <div>
+            <label for="id_remark">Remark:</label>
+            <textarea name="remark" id="id_remark">{{ order.remark }}</textarea>
+            
+
+        </div>
+        <div>
+            <label for="id_progress">Progress:</label>
+            <select name="progress" id="id_progress">
+                <option value="Not Started" {% if order.progress == "Not Started" %}selected{% endif %}>Not Started</option>
+                <option value="In Progress" {% if order.progress == "In Progress" %}selected{% endif %}>In Progress</option>
+                <option value="Completed" {% if order.progress == "Completed" %}selected{% endif %}>Completed</option>
+            </select>
+        </div>
+    {% endif %}
+
+    <button type="submit">Save Changes</button>
+</form>
+
+<a href="{% url 'order_list' %}" style="display: inline-block; margin-top: 20px;">Back to History</a>
+{% endblock %}

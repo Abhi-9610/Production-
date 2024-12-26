@@ -1,0 +1,108 @@
+{% extends 'orders/base.html' %}
+
+{% block content %}
+<h2>Order History</h2>
+
+<!-- Search Bar -->
+<form method="get" action="" style="margin-bottom: 20px;">
+    <input type="text" name="q" placeholder="Search orders..." value="{{ query }}">
+    <button type="submit">Search</button>
+</form>
+
+<table>
+    <thead>
+        <tr>
+            <th>Order ID</th>
+            <th>Company Name</th>
+            <th>Client Name</th>
+            <th>Salesperson Name</th>
+            <th>Front Design</th>
+            <th>Back Design</th> <!-- New column for image -->
+            <th>Pocket Design</th>
+            <th>Sleeve Design</th>
+            <th>Design Size</th>
+            <th>Progress</th>
+            <th>Order Date</th>
+            <th>Deadline Date</th>
+            <th>Remark</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for order in orders %}
+        <tr>
+            <td>{{ order.order_id }}</td>
+            <td>{{ order.company_name }}</td>
+            <td>{{ order.client_name }}</td>
+            <td>{{ order.salesperson_name }}</td>
+            <td>
+                {% if order.front_design %}
+                    <img src="{{ order.front_design.url }}" alt="Design" style="width: 100px; height: auto; border: 1px solid #ddd; border-radius: 5px;">
+                    <a href="{{ order.front_design.url }}" download>
+                        <i class="fas fa-download" style="font-size: 25px; color: #6200ea; margin-top: 10px;"></i>
+                    </a>
+                {% else %}
+                    No Design
+                {% endif %}
+            </td>
+            <td>
+                {% if order.back_design %}
+                    <img src="{{ order.back_design.url }}" alt="Design" style="width: 100px; height: auto; border: 1px solid #ddd; border-radius: 5px;">
+                    <a href="{{ order.back_design.url }}" download>
+                        <i class="fas fa-download" style="font-size: 25px; color: #6200ea; margin-top: 10px;"></i>
+                    </a>
+                {% else %}
+                    No Design
+                {% endif %}
+            </td>
+            <td>
+                {% if order.pocket_design %}
+                    <img src="{{ order.pocket_design.url }}" alt="Design" style="width: 100px; height: auto; border: 1px solid #ddd; border-radius: 5px;">
+                    <a href="{{ order.pocket_design.url }}" download>
+                        <i class="fas fa-download" style="font-size: 25px; color: #6200ea; margin-top: 10px;"></i>
+                    </a>
+                {% else %}
+                    No Design
+                {% endif %}
+            </td>
+            <td>
+                {% if order.sleeve_design %}
+                    <img src="{{ order.sleeve_design.url }}" alt="Design" style="width: 100px; height: auto; border: 1px solid #ddd; border-radius: 5px;">
+                    <a href="{{ order.sleeve_design.url }}" download>
+                        <i class="fas fa-download" style="font-size: 25px; color: #6200ea; margin-top: 10px;"></i>
+                    </a>
+                {% else %}
+                    No Design
+                {% endif %}
+            </td>
+            <td>{% if not order.design_Size %} Size not Given {% endif %}</td>
+            <td>{{ order.progress }}</td>
+            <td>{{ order.order_date }}</td>
+            <td>{{ order.deadline_date }}</td>
+            <td>{{ order.remark }}</td>
+            
+            <!-- Actions -->
+            {% if user.is_superuser or 'Salespersons' in user_groups %}
+                <!-- Both Edit and Delete buttons for Superuser and Salespersons -->
+                <td>
+                    <a href="{% url 'edit_order' order.pk %}" style="margin-right: 10px;">Edit</a>
+                    <a href="{% url 'delete_order' order.pk %}" style="color: red;">Delete</a>
+                </td>
+            {% elif 'Production' in user_groups %}
+                <!-- Only Edit button for Production -->
+                <td>
+                    <a href="{% url 'edit_order' order.pk %}" style="margin-right: 10px;">Edit</a>
+                </td>
+            {% else %}
+                <!-- No buttons for other users -->
+                <td></td>
+            {% endif %}
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+{% if not orders %}
+<p>No orders found.</p>
+{% endif %}
+{% endblock %}
